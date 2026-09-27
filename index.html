@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="名前と生年月日から数秘術の鑑定結果を表示。数字の意味を参照し、結果と資料をまとめてPDFに保存できます。">
+  <meta name="referrer" content="no-referrer"><title>数秘術鑑定</title>
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="core.js"></script><script defer src="meanings.js"></script><script defer src="app.js"></script>
+</head>
+<body>
+  <header class="app-header no-print">
+    <a class="brand" href="#result">数秘術鑑定<span>NUMEROLOGY</span></a>
+    <nav aria-label="ページ切り替え"><button type="button" class="nav-button active" data-view="result" aria-current="page">鑑定結果</button><button type="button" class="nav-button" data-view="reference">資料 · 数字の意味</button></nav>
+    <button type="button" id="pdf-button" class="primary" disabled>PDFに保存</button>
+  </header>
+  <main>
+    <section class="input-panel no-print" id="input-panel" aria-label="鑑定する方の情報">
+      <form id="reading-form" novalidate>
+        <div class="input-heading"><h1>鑑定する方の情報</h1><span>出生時のお名前を入力</span></div>
+        <div class="form-fields">
+          <label>表示するお名前 <span class="optional">任意</span><input id="display-name" name="displayName" maxlength="80" autocomplete="off" placeholder="漢字のお名前"></label>
+          <label>姓の読み<input id="surname" name="surname" required maxlength="50" autocomplete="off" placeholder="ひらがな"></label>
+          <label>名の読み<input id="given" name="given" required maxlength="50" autocomplete="off" placeholder="ひらがな"></label>
+          <label>生年月日<input id="birthday" name="birthday" type="date" min="1000-01-01" required></label>
+          <button class="primary calculate-button" type="submit">鑑定結果を表示</button>
+        </div>
+        <div class="input-foot"><span id="roman-preview">ローマ字表記は、読みの入力後に表示されます。</span><span>入力内容は保存・送信されません。</span></div>
+        <p id="form-error" class="error" role="alert" hidden></p>
+      </form>
+    </section>
+    <section id="result-view" class="view" aria-label="鑑定結果">
+      <div id="empty-state" class="empty-state"><span class="empty-number">1 — 9</span><h2>お名前と生年月日から、鑑定をはじめる</h2><p>鑑定結果と説明資料を行き来しながらご覧いただけます。</p><button type="button" id="start-input" class="secondary">お名前を入力する</button></div>
+      <article id="result-sheet" class="paper result-paper" hidden></article>
+      <details id="calculation-details" class="calculation-details no-print" hidden><summary>計算の内訳を確認</summary><div id="calculation-content"></div></details>
+    </section>
+    <section id="reference-view" class="view" aria-label="数字の意味の資料" hidden>
+      <article class="paper reference-paper">
+        <h1>数字の主な作用と意味</h1>
+        <div class="reference-intro"><p>数術の数の法則の中心にあるのは、1から9までの一桁の自然数です。数術では、これを「ベース・ナンバー」と呼び、すべての数の基本となる数だと考えます。</p><p>ベース・ナンバーには、それぞれ固有の数術的な意味があります。現代の数術が定める数の意味は、たとえば以下のようなものになります。</p></div>
+        <div id="meanings-table"></div>
+        <footer class="paper-footer">出典：ON PROJECT</footer>
+      </article>
+    </section>
+  </main>
+  <footer class="app-footer no-print">数秘術鑑定<span>鑑定結果と資料を、ひとつのPDFに。</span></footer>
+  <dialog id="print-dialog" class="no-print" aria-labelledby="print-title">
+    <form method="dialog"><button class="close-dialog" aria-label="閉じる">×</button></form>
+    <h2 id="print-title">鑑定結果と資料をPDFに保存</h2>
+    <p>① 鑑定結果（横向き）<br>② 数字の主な作用と意味（縦向き）</p>
+    <p class="print-guide">次の印刷画面で、保存先を「PDFに保存」にしてください。用紙はA4、倍率は100%、ヘッダーとフッターはオフにすると整います。</p>
+    <button type="button" id="confirm-print" class="primary">印刷画面を開く</button>
+  </dialog>
+  <noscript><p>このアプリの計算にはJavaScriptを有効にしてください。</p></noscript>
+</body></html>

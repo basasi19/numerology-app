@@ -1,0 +1,96 @@
+/* Both sheets use the same A4 landscape page. Screen breakpoints do not apply. */
+@page reading { size: A4 landscape; margin: 10mm; }
+:root { background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+html, body { margin: 0; padding: 0; background: white; }
+.no-print, #empty-state, noscript { display: none !important; }
+main { display: contents; padding: 0; }
+.view, .view[hidden] { display: contents !important; }
+.paper {
+  page: reading;
+  box-sizing: border-box;
+  width: 277mm;
+  height: 189mm;
+  padding: 0;
+  margin: 0;
+  max-width: none;
+  border: 0;
+  box-shadow: none;
+  break-inside: avoid;
+  font-size: 10pt;
+  line-height: 1.4;
+}
+#result-sheet { break-after: page; }
+#result-sheet[hidden] { display: none !important; }
+.sheet-content { width: 277mm; display: flow-root; zoom: var(--print-scale, 1); }
+.result-title {
+  font-size: 23pt; line-height: 1.2; letter-spacing: .1em;
+  padding-bottom: 2mm; margin: 0 0 3mm;
+}
+.result-grid { display: grid; grid-template-columns: minmax(0,39%) minmax(0,61%); }
+.result-left { padding-right: 5mm; border-right: 1px solid var(--line); }
+.result-right { padding-left: 5mm; margin: 0; }
+.person-name { font-size: 27pt; line-height: 1.25; letter-spacing: .06em; margin: 0; overflow-wrap: anywhere; }
+.person-name span { font-size: 12pt; }
+.birth-date { font-size: 12pt; line-height: 1.4; margin: 1mm 0 3mm; }
+.section-heading { font-size: 12pt; line-height: 1.3; margin: 2.5mm 0 2mm; padding-top: 2mm; break-after: avoid; }
+.name-letters { gap: 1.5mm 4mm; padding: 1mm 0 3mm; }
+.letter-word { gap: 1.5mm; }
+.letter { min-width: 4mm; }
+.letter .alpha { font-size: 16pt; line-height: 1.2; }
+.metric { grid-template-columns: 15mm 25mm minmax(0,1fr); gap: 1mm; padding: 3mm 0; }
+.metric dt { font-size: 10pt; }
+.metric .number { font-size: 23pt; line-height: 1.2; }
+.metric .number small { font-size: 14pt; }
+.metric .description { font-size: 9pt; line-height: 1.5; }
+.correlation-heading { border: 0; padding-top: 0; margin-top: 3mm; }
+.correlation { height: 52mm; width: 100%; break-inside: avoid; }
+.birth-mission { grid-template-columns: 40% 60%; min-height: 24mm; }
+.birth-stat { padding-right: 3mm; }
+.stat-label { font-size: 12pt; line-height: 1.3; margin: 0 0 1mm; }
+.big-number { font-size: 38pt; line-height: 1.05; }
+.big-number small { font-size: 26pt; }
+.birth-stat>p:last-child { font-size: 9pt; margin: 1mm 0 0; }
+.mission { padding-left: 5mm; }
+.weekday { font-size: 25pt; line-height: 1.2; margin: 1mm 0; }
+.mission-text { font-size: 10pt; line-height: 1.4; margin: 0; }
+.stages { padding-top: 0; }
+.stage-row {
+  min-height: 7.6mm; margin: .7mm 0 .7mm calc(var(--indent)*3mm);
+  padding: 0 4mm 0 1mm; gap: 3mm; flex-wrap: nowrap;
+}
+.stage-row .badge { width: 7.5mm; height: 7.5mm; flex-basis: 7.5mm; font-size: 18pt; }
+.stage-label { font-size: 11pt; min-width: 21mm; }
+.stage-age { font-size: 10pt; }
+.challenge { font-size: 9pt; margin: 0; width: auto; }
+.foundation .stage-label { min-width: 21mm; }
+.cycle-scroll { overflow: visible; }
+.cycle-table { min-width: 0; font-size: 9pt; line-height: 1.2; }
+.cycle-table th, .cycle-table td { height: 4.6mm; padding: .45mm 0; }
+.cycle-table thead th { padding: .7mm 0; }
+.cycle-table .badge { width: 6mm; height: 6mm; min-width: 6mm; font-size: 14pt; }
+.cycle-table .age-head { width: 19mm; font-size: 8pt; }
+.cycle-table tbody th { font-size: 8pt; }
+.lifecycle { margin-top: 1mm; break-inside: avoid; }
+.plant-strip svg { height: 22mm; }
+.lifecycle-numbers { font-size: 17pt; line-height: 1.2; }
+.paper-footer { font-size: 7pt; line-height: 1.3; padding-top: 2mm; margin-top: 2mm; }
+.reference-paper { padding: 0; }
+.reference-paper h1 { font-family: 'Yu Mincho','Hiragino Mincho ProN',serif; font-weight: 600; font-size: 23pt; line-height: 1.2; letter-spacing: .04em; margin: 0 0 3mm; }
+.reference-intro { font-size: 9pt; line-height: 1.45; margin-bottom: 3mm; }
+.reference-intro p { margin: 0 0 1mm; }
+.meaning-table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 10pt; line-height: 1.4; }
+.meaning-table th, .meaning-table td { padding: 1.3mm 2mm; font-size: 10pt; vertical-align: middle; }
+.meaning-table thead th { font-size: 12pt; padding: 1.5mm 2mm; }
+.meaning-table thead th:nth-child(1) { width: 6%; }
+.meaning-table thead th:nth-child(2) { width: 44%; }
+.meaning-table thead th:nth-child(3) { width: 25%; }
+.meaning-table thead th:nth-child(4) { width: 25%; }
+.meaning-table tr { break-inside: avoid; }
+.meaning-table tbody th { padding: 1mm; }
+.meaning-table .badge { width: 8mm; height: 8mm; font-size: 20pt; }
+.master-table { margin-top: 2mm; }
+.master-table tbody { display: grid; grid-template-columns: 1fr 1fr; gap: 3mm; }
+.master-table tr { display: grid; grid-template-columns: 15mm minmax(0,1fr); }
+.master-table th { display: flex; align-items: center; justify-content: center; width: auto; }
+.master-table td { border-left: 0; font-size: 9.5pt; padding: 1.5mm 2mm; }
+.master-table .badge { font-size: 16pt; }

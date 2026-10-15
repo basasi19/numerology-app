@@ -58,7 +58,7 @@
   function renderResult(r){
     const labels=['トラウマ期','自立期','成人期','老年期'];
     const metrics=[['人質数',r.person,'全体的な人柄'],['心質',r.soul,'本心・本音・魂の本質'],['気質',r.outer,'社会性・雰囲気・外から見られる気質'],['成熟数',{value:r.maturity.value,previous:null},'36歳より徐々に目覚める人格']];
-    $('result-sheet').innerHTML=`<h1 class="result-title">数秘術鑑定結果</h1><div class="result-grid"><div class="result-left"><h2 class="person-name">${esc(r.displayName)} <span>様</span></h2><p class="birth-date">${r.year}年${r.month}月${r.day}日生まれ　${r.age}歳</p><h3 class="section-heading">出生時の名前</h3><div class="name-letters">${r.roman.split(' ').map(word=>`<div class="letter-word">${[...word].map(c=>`<span class="letter"><span class="value ${'AEIOU'.includes(c)?'vowel':''}">${(c.charCodeAt(0)-65)%9+1}</span><span class="alpha">${c}</span></span>`).join('')}</div>`).join('')}</div><dl class="metrics">${metrics.map(([label,n,desc])=>`<div class="metric"><dt>${label}</dt><dd class="number">${number(n)}</dd><dd class="description">${desc}</dd></div>`).join('')}</dl><h3 class="section-heading correlation-heading">数字の相関図</h3>${correlation()}</div><div class="result-right"><div class="birth-mission"><div class="birth-stat"><p class="stat-label">誕生数</p><div class="big-number">${number(r.birth)}</div><p>ベースに在る使命</p></div><div class="mission"><p class="stat-label">天命</p><div class="weekday">${r.weekday}曜日</div><p class="mission-text">${r.mission}</p></div></div><h3 class="section-heading">誕生数と人生の4期</h3><div class="stages">${r.stages.map((s,i)=>({s,i})).reverse().map(({s,i})=>`<div class="stage-row" style="--indent:${i+1};--stage-color:${color(s.value)}">${badge(s.value)}<span class="stage-label">${labels[i]}</span><span class="stage-age">${s.start}〜${s.end}歳</span><span class="challenge">杖：${s.challenge}</span></div>`).join('')}<div class="stage-row foundation" style="--stage-color:var(--c1)">${badge(r.birth.value)}<span class="stage-label">誕生数</span><span class="stage-age">人生の土台</span></div></div><h3 class="section-heading">個人の周期</h3>${cycleTable(r)}<div class="lifecycle"><h3 class="section-heading">9年ライフサイクル</h3><div class="plant-strip" role="img" aria-label="種から芽生え、成長、開花、実りを経て手放す、9つの植物のライフサイクル">${plantStrip()}</div><div class="lifecycle-numbers">${Array.from({length:9},(_,i)=>`<span style="color:${color(i+1)}">${i+1}</span>`).join('')}</div></div></div></div><footer class="paper-footer">鑑定基準日：${r.asOf.replaceAll('-','/')}　｜　図版参考：ON PROJECT ／ Zen Education Network・Zen Session</footer>`;
+    $('result-sheet').innerHTML=`<div class="sheet-content"><h1 class="result-title">数秘術鑑定結果</h1><div class="result-grid"><div class="result-left"><h2 class="person-name">${esc(r.displayName)} <span>様</span></h2><p class="birth-date">${r.year}年${r.month}月${r.day}日生まれ　${r.age}歳</p><h3 class="section-heading">出生時の名前</h3><div class="name-letters">${r.roman.split(' ').map(word=>`<div class="letter-word">${[...word].map(c=>`<span class="letter"><span class="alpha">${c}</span></span>`).join('')}</div>`).join('')}</div><dl class="metrics">${metrics.map(([label,n,desc])=>`<div class="metric"><dt>${label}</dt><dd class="number">${number(n)}</dd><dd class="description">${desc}</dd></div>`).join('')}</dl><h3 class="section-heading correlation-heading">数字の相関図</h3>${correlation()}</div><div class="result-right"><div class="birth-mission"><div class="birth-stat"><p class="stat-label">誕生数</p><div class="big-number">${number(r.birth)}</div><p>ベースに在る使命</p></div><div class="mission"><p class="stat-label">天命</p><div class="weekday">${r.weekday}曜日</div><p class="mission-text">${r.mission}</p></div></div><h3 class="section-heading">誕生数と人生の4期</h3><div class="stages">${r.stages.map((s,i)=>({s,i})).reverse().map(({s,i})=>`<div class="stage-row" style="--indent:${i+1};--stage-color:${color(s.value)}">${badge(s.value)}<span class="stage-label">${labels[i]}</span><span class="stage-age">${s.start}〜${s.end}歳</span><span class="challenge">杖：${s.challenge}</span></div>`).join('')}<div class="stage-row foundation" style="--stage-color:var(--c1)">${badge(r.birth.value)}<span class="stage-label">誕生数</span><span class="stage-age">人生の土台</span></div></div><h3 class="section-heading">個人の周期</h3>${cycleTable(r)}<div class="lifecycle"><h3 class="section-heading">9年ライフサイクル</h3><div class="plant-strip" role="img" aria-label="種から芽生え、成長、開花、実りを経て手放す、9つの植物のライフサイクル">${plantStrip()}</div><div class="lifecycle-numbers">${Array.from({length:9},(_,i)=>`<span style="color:${color(i+1)}">${i+1}</span>`).join('')}</div></div></div></div><footer class="paper-footer">鑑定基準日：${r.asOf.replaceAll('-','/')}</footer></div>`;
     const seq=n=>n.steps.join(' → ');
     const [m,d,y]=r.bases;
     const difference=(a,b)=>`${Math.max(a,b)} − ${Math.min(a,b)} ＝ ${Math.abs(a-b)}`;
@@ -73,11 +73,45 @@
   }
   $('reading-form').addEventListener('submit',event=>{event.preventDefault();if(calculateForm())$('result-sheet').scrollIntoView({behavior:'smooth',block:'start'});});
   $('meanings-table').innerHTML=`<table class="meaning-table"><thead><tr><th scope="col">数</th><th scope="col">数字の意味</th><th scope="col">プラスの作用</th><th scope="col">マイナスの作用</th></tr></thead><tbody>${window.NUMBER_MEANINGS.slice(0,9).map(([n,meaning,plus,minus])=>`<tr><th scope="row">${badge(n)}</th><td>${lines(meaning)}</td><td data-label="プラスの作用">${lines(plus)}</td><td data-label="マイナスの作用">${lines(minus)}</td></tr>`).join('')}</tbody></table><table class="meaning-table master-table" aria-label="11と22の意味"><tbody>${window.NUMBER_MEANINGS.slice(9).map(([n,meaning])=>`<tr><th scope="row">${badge(n)}</th><td>${lines(meaning)}</td></tr>`).join('')}</tbody></table>`;
+  // Fit each complete sheet to the printable height; never hide overflowing content.
+  // beforeprint also covers Ctrl+P and printing while the reference tab is open.
+  const printStyles=$('print-styles');
+  function preparePrint(){
+    printStyles.media='all';
+    const pxPerMm=96/25.4, maxHeight=187*pxPerMm;
+    document.querySelectorAll('.paper').forEach(sheet=>{
+      const content=sheet.querySelector('.sheet-content');
+      if(!content || sheet.hidden)return;
+      sheet.style.removeProperty('--print-scale');
+      content.style.marginLeft='0';
+      const bounds=content.getBoundingClientRect();
+      const height=Math.max(bounds.height,content.scrollHeight);
+      let scale=Math.min(1,maxHeight/height,277*pxPerMm/Math.max(bounds.width,content.scrollWidth));
+      sheet.style.setProperty('--print-scale',String(scale));
+      // Fractional font metrics can add a line after zoom; measure the fitted result too.
+      for(let pass=0;pass<3 && content.getBoundingClientRect().height>maxHeight;pass++){
+        scale*=maxHeight/content.getBoundingClientRect().height*.995;
+        sheet.style.setProperty('--print-scale',String(scale));
+      }
+      content.style.marginLeft=scale<1 ? ((277*pxPerMm)*(1-scale)/(2*scale))+'px' : '0';
+    });
+  }
+  function restoreScreen(){
+    printStyles.media='print';
+    document.querySelectorAll('.paper').forEach(sheet=>{
+      sheet.style.removeProperty('--print-scale');
+      const content=sheet.querySelector('.sheet-content');
+      if(content)content.style.marginLeft='';
+    });
+  }
+  window.addEventListener('beforeprint',preparePrint);
+  window.addEventListener('afterprint',restoreScreen);
   $('pdf-button').addEventListener('click',()=>{if(current)$('print-dialog').showModal();});
   $('confirm-print').addEventListener('click',async()=>{
     $('print-dialog').close();
     const image=new Image();image.src='plant-lifecycle.png';
     await image.decode().catch(()=>{});
+    await document.fonts.ready;
     window.print();
   });
   // The same calculation is available to supported in-browser agents.

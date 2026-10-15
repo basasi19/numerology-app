@@ -4,8 +4,9 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="名前と生年月日から数秘術の鑑定結果を表示。数字の意味を参照し、結果と資料をまとめてPDFに保存できます。">
   <meta name="referrer" content="no-referrer"><title>数秘術鑑定</title>
-  <link rel="stylesheet" href="styles.css">
-  <script defer src="core.js"></script><script defer src="meanings.js"></script><script defer src="app.js"></script>
+  <link rel="stylesheet" href="styles.css?v=20261015-pdf">
+  <link id="print-styles" rel="stylesheet" href="print.css?v=20261015-pdf" media="print">
+  <script defer src="core.js?v=20261015-pdf"></script><script defer src="meanings.js?v=20261015-pdf"></script><script defer src="app.js?v=20261015-pdf"></script>
 </head>
 <body>
   <header class="app-header no-print">
@@ -34,11 +35,11 @@
       <details id="calculation-details" class="calculation-details no-print" hidden><summary>計算の内訳を確認</summary><div id="calculation-content"></div></details>
     </section>
     <section id="reference-view" class="view" aria-label="数字の意味の資料" hidden>
-      <article class="paper reference-paper">
+      <article class="paper reference-paper"><div class="sheet-content">
         <h1>数字の主な作用と意味</h1>
         <div class="reference-intro"><p>数術の数の法則の中心にあるのは、1から9までの一桁の自然数です。数術では、これを「ベース・ナンバー」と呼び、すべての数の基本となる数だと考えます。</p><p>ベース・ナンバーには、それぞれ固有の数術的な意味があります。現代の数術が定める数の意味は、たとえば以下のようなものになります。</p></div>
         <div id="meanings-table"></div>
-        <footer class="paper-footer">出典：ON PROJECT</footer>
+        </div>
       </article>
     </section>
   </main>
@@ -46,8 +47,8 @@
   <dialog id="print-dialog" class="no-print" aria-labelledby="print-title">
     <form method="dialog"><button class="close-dialog" aria-label="閉じる">×</button></form>
     <h2 id="print-title">鑑定結果と資料をPDFに保存</h2>
-    <p>① 鑑定結果（横向き）<br>② 数字の主な作用と意味（縦向き）</p>
-    <p class="print-guide">次の印刷画面で、保存先を「PDFに保存」にしてください。用紙はA4、倍率は100%、ヘッダーとフッターはオフにすると整います。</p>
+    <p>① 鑑定結果（横向き）<br>② 数字の主な作用と意味（横向き）</p>
+    <p class="print-guide">次の印刷画面で、保存先を「PDFに保存」にしてください。両方ともA4横1ページです。用紙はA4・横向き、倍率は100%、ヘッダーとフッターはオフにすると整います。</p>
     <button type="button" id="confirm-print" class="primary">印刷画面を開く</button>
   </dialog>
   <noscript><p>このアプリの計算にはJavaScriptを有効にしてください。</p></noscript>

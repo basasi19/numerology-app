@@ -120,9 +120,26 @@
     window.print();
   });
   const pngDialog=$('png-dialog'), pngPage=$('png-sheet'), download=$('png-download'), preview=$('png-preview');
-  let previewUrl=null, requestId=0;
+  const shareButton=$('png-share');
+  const appleMobile=/iPhone|iPad|iPod/.test(navigator.userAgent) ||
+    (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+  const shareHint=appleMobile?'「写真に保存」を押し、次の画面で「画像を保存」を選んでください。':'「画像を共有」で利用するアプリを選べます。ファイルとして保存するには「PNGをダウンロード」を押してください。';
+  let previewUrl=null, shareFile=null, requestId=0;
+  function prepareShare(blob){
+    // Prepare the file before the tap; awaiting image generation on tap loses
+    // the user activation Safari needs to open its native share sheet.
+    if(typeof navigator.share!=='function' || typeof navigator.canShare!=='function')return;
+    try{
+      const file=new File([blob],download.download,{type:'image/png'});
+      if(!navigator.canShare({files:[file]}))return;
+      shareFile=file;
+      shareButton.textContent=appleMobile?'写真に保存':'画像を共有';
+      shareButton.hidden=false;
+    }catch{ /* Download and the image preview remain usable. */ }
+  }
   function clearPng(){
     requestId++;
+    shareFile=null; shareButton.hidden=true; shareButton.disabled=false;
     preview.hidden=true; preview.removeAttribute('src');
     download.hidden=true; download.removeAttribute('href'); download.removeAttribute('download');
     if(previewUrl){URL.revokeObjectURL(previewUrl);previewUrl=null;}
@@ -142,13 +159,30 @@
       const safeName=result ? reading.displayName.replace(/[<>:"/\\|?*\x00-\x1f]/g,'_').trim().slice(0,50) : '';
       download.download=result?['数秘術鑑定結果',safeName,reading.asOf].filter(Boolean).join('_')+'.png':'数字の主な作用と意味.png';
       download.hidden=false;
-      $('png-status').textContent='画像の準備ができました。スマートフォンでは、画像を長押しして保存することもできます。';
+      prepareShare(blob);
+      $('png-status').textContent=shareFile
+        ? shareHint
+        : (appleMobile?'写真に入れたい場合は、上の画像を長押しし、保存の項目が表示されたら選んでください。':'「PNGをダウンロード」で画像ファイルを保存できます。');
     }catch{
       if(id!==requestId || !pngDialog.open)return;
       $('png-status').textContent='画像を作成できませんでした。ページを開き直すか、もう一度お試しください。';
       $('png-retry').hidden=false;
     }
   }
+  shareButton.addEventListener('click',async()=>{
+    const file=shareFile;
+    if(!file || shareButton.disabled)return;
+    shareButton.disabled=true;
+    $('png-status').textContent=shareHint;
+    try{
+      await navigator.share({files:[file]});
+      // The browser does not tell us which target the person chose.
+    }catch(error){
+      if(shareFile===file && error?.name!=='AbortError'){
+        $('png-status').textContent='共有画面を開けませんでした。プレビューを長押しするか、「PNGをダウンロード」をお使いください。';
+      }
+    }finally{if(shareFile===file)shareButton.disabled=false;}
+  });
   $('png-button').addEventListener('click',()=>{
     pngPage.options[0].disabled=!current;
     pngPage.value=$('reference-view').hidden?'result':'reference';

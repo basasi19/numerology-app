@@ -13,4 +13,6 @@
 #png-dialog .png-size,#png-status{font-size:13px;color:var(--muted);line-height:1.6}
 #png-preview{display:block;width:auto;height:auto;max-width:100%;max-height:32vh;margin:12px auto;border:1px solid var(--line)}
 #png-download{display:inline-block;border-radius:6px;padding:11px 18px;text-decoration:none;font-size:15px}
+.png-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+#png-share:not([hidden]) + #png-download{background:white;color:var(--ink);border:1px solid var(--line)}
 @media screen and (max-width:800px){.app-header{gap:10px;flex-wrap:wrap}.app-header nav{order:3;width:100%;margin:0}.nav-button{flex:1}.export-actions{margin-left:auto;gap:5px}.export-actions button{font-size:13px;padding:9px 10px}}

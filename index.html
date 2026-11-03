@@ -4,9 +4,9 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="名前と生年月日から数秘術の鑑定結果を表示。鑑定結果と説明資料をPDFやPNG画像に保存できます。">
   <meta name="referrer" content="no-referrer"><title>数秘術鑑定</title>
-  <link rel="stylesheet" href="styles.css?v=20261103-png">
+  <link rel="stylesheet" href="styles.css?v=20261103-photo">
   <link id="print-styles" rel="stylesheet" href="print.css?v=20261015-pdf" media="print">
-  <script defer src="core.js?v=20261015-pdf"></script><script defer src="meanings.js?v=20261015-pdf"></script><script defer src="png-export.js?v=20261103-png"></script><script defer src="app.js?v=20261103-png"></script>
+  <script defer src="core.js?v=20261015-pdf"></script><script defer src="meanings.js?v=20261015-pdf"></script><script defer src="png-export.js?v=20261103-png"></script><script defer src="app.js?v=20261103-photo"></script>
 </head>
 <body>
   <header class="app-header no-print">
@@ -59,7 +59,10 @@
     <p class="png-size">横向き・2480 × 1754 px</p>
     <img id="png-preview" alt="" hidden>
     <p id="png-status" role="status" aria-live="polite"></p>
-    <a id="png-download" class="primary" hidden>PNGを保存</a>
+    <div class="png-actions">
+      <button type="button" id="png-share" class="primary" hidden>画像を共有</button>
+      <a id="png-download" class="primary" hidden>PNGをダウンロード</a>
+    </div>
     <button type="button" id="png-retry" class="secondary" hidden>もう一度作成</button>
   </dialog>
   <noscript><p>このアプリの計算にはJavaScriptを有効にしてください。</p></noscript>

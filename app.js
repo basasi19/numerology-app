@@ -7,10 +7,15 @@
   const badge=n=>`<span class="badge" style="--badge-color:${color(n)}">${n}</span>`;
   const number=n=>`${n.value}${n.previous===null?'':` <small>/ ${n.previous}</small>`}`;
   let current=null;
+  function syncExportButtons(){
+    $('pdf-button').disabled=!current;
+    $('png-button').disabled=!current && $('reference-view').hidden;
+  }
   $('birthday').max=N.localISO();
   function showView(view){
     const isRef=view==='reference';
     $('result-view').hidden=isRef; $('reference-view').hidden=!isRef; $('input-panel').hidden=isRef;
+    syncExportButtons();
     document.querySelectorAll('[data-view]').forEach(b=>{const active=b.dataset.view===(isRef?'reference':'result');b.classList.toggle('active',active);if(active)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
   }
   function navigate(view){if(location.hash!==`#${view}`)location.hash=view;else showView(view);}
@@ -22,7 +27,7 @@
     const surname=$('surname').value.trim(),given=$('given').value.trim();
     $('roman-preview').textContent=surname||given?`ローマ字：${N.romanize(surname)} ${N.romanize(given)}`:'ローマ字表記は、読みの入力後に表示されます。';
     // An edited form invalidates its old result so it cannot be printed under new inputs.
-    if(current){current=null;$('result-sheet').hidden=true;$('empty-state').hidden=false;$('calculation-details').hidden=true;$('pdf-button').disabled=true;}
+    if(current){current=null;$('result-sheet').hidden=true;$('empty-state').hidden=false;$('calculation-details').hidden=true;syncExportButtons();}
     $('form-error').hidden=true;
   }
   $('reading-form').addEventListener('input',previewRoman);
@@ -63,13 +68,13 @@
     const [m,d,y]=r.bases;
     const difference=(a,b)=>`${Math.max(a,b)} − ${Math.min(a,b)} ＝ ${Math.abs(a-b)}`;
     $('calculation-content').innerHTML=`<p><strong>お名前</strong>　${esc(r.roman)}<br>人質数：${seq(r.person)}　／　心質：${seq(r.soul)}　／　気質：${seq(r.outer)}</p><p><strong>誕生数</strong>　${r.year} ＋ ${r.month} ＋ ${r.day} ＝ ${r.birth.total}<br>${r.birth.split?`${Math.floor(r.birth.total/100)} ＋ ${r.birth.total%100}`:[...String(r.birth.total)].join(' ＋ ')} ＝ ${r.birth.intermediate} → ${r.birth.steps.slice(1).join(' → ')||r.birth.value}<br>表示：${N.notation(r.birth)}</p><p><strong>成熟数</strong>　${r.birth.value} ＋ ${r.person.value} ＝ ${seq(r.maturity)}<br><strong>4期</strong>　月 ${m}・日 ${d}・年 ${y}<br>1期：${m}＋${d} → ${r.stages[0].value}　2期：${d}＋${y} → ${r.stages[1].value}　3期：${r.stages[0].value}＋${r.stages[1].value} → ${r.stages[2].value}　4期：${m}＋${y} → ${r.stages[3].value}</p><p><strong>杖</strong>　大きい数から小さい数を引き、同じ数なら0。<br>1期（月と日）：${difference(m,d)}　2期（日と年）：${difference(d,y)}<br>3期（1期の杖と2期の杖）：${difference(r.stages[0].challenge,r.stages[1].challenge)}　4期（月と年）：${difference(m,y)}</p><p><strong>期間</strong>　トラウマ期の終わり：36 − ${r.birth.value} ＝ ${r.stages[0].end}歳。以降は9年ごとの区切り。<br><strong>個人の周期</strong>　${r.birth.value}の列が0歳。現在は${r.age}歳、周期は${r.cycle}。</p>`;
-    $('result-sheet').hidden=false;$('empty-state').hidden=true;$('calculation-details').hidden=false;$('pdf-button').disabled=false;
+    $('result-sheet').hidden=false;$('empty-state').hidden=true;$('calculation-details').hidden=false;syncExportButtons();
   }
   function calculateForm(){
     try {
       current=N.calculate({surname:$('surname').value.trim(),given:$('given').value.trim(),birthday:$('birthday').value,displayName:$('display-name').value});
       renderResult(current);$('form-error').hidden=true;navigate('result');return current;
-    } catch(error){$('form-error').textContent=error.message;$('form-error').hidden=false;current=null;$('pdf-button').disabled=true;return null;}
+    } catch(error){$('form-error').textContent=error.message;$('form-error').hidden=false;current=null;syncExportButtons();return null;}
   }
   $('reading-form').addEventListener('submit',event=>{event.preventDefault();if(calculateForm())$('result-sheet').scrollIntoView({behavior:'smooth',block:'start'});});
   $('meanings-table').innerHTML=`<table class="meaning-table"><thead><tr><th scope="col">数</th><th scope="col">数字の意味</th><th scope="col">プラスの作用</th><th scope="col">マイナスの作用</th></tr></thead><tbody>${window.NUMBER_MEANINGS.slice(0,9).map(([n,meaning,plus,minus])=>`<tr><th scope="row">${badge(n)}</th><td>${lines(meaning)}</td><td data-label="プラスの作用">${lines(plus)}</td><td data-label="マイナスの作用">${lines(minus)}</td></tr>`).join('')}</tbody></table><table class="meaning-table master-table" aria-label="11と22の意味"><tbody>${window.NUMBER_MEANINGS.slice(9).map(([n,meaning])=>`<tr><th scope="row">${badge(n)}</th><td>${lines(meaning)}</td></tr>`).join('')}</tbody></table>`;
@@ -114,6 +119,44 @@
     await document.fonts.ready;
     window.print();
   });
+  const pngDialog=$('png-dialog'), pngPage=$('png-sheet'), download=$('png-download'), preview=$('png-preview');
+  let previewUrl=null, requestId=0;
+  function clearPng(){
+    requestId++;
+    preview.hidden=true; preview.removeAttribute('src');
+    download.hidden=true; download.removeAttribute('href'); download.removeAttribute('download');
+    if(previewUrl){URL.revokeObjectURL(previewUrl);previewUrl=null;}
+    $('png-retry').hidden=true; $('png-status').textContent='';
+  }
+  async function updatePng(){
+    clearPng();
+    const id=requestId, result=pngPage.value==='result', reading=current;
+    if(result && !reading)return;
+    $('png-status').textContent='画像を作成しています…';
+    try{
+      const blob=await window.NumerologyPng.render(result ? $('result-sheet') : document.querySelector('.reference-paper'));
+      if(id!==requestId || !pngDialog.open || (result && reading!==current))return;
+      previewUrl=URL.createObjectURL(blob);
+      preview.src=previewUrl; preview.alt=result?'鑑定結果のプレビュー':'数字の主な作用と意味のプレビュー'; preview.hidden=false;
+      download.href=previewUrl;
+      const safeName=result ? reading.displayName.replace(/[<>:"/\\|?*\x00-\x1f]/g,'_').trim().slice(0,50) : '';
+      download.download=result?['数秘術鑑定結果',safeName,reading.asOf].filter(Boolean).join('_')+'.png':'数字の主な作用と意味.png';
+      download.hidden=false;
+      $('png-status').textContent='画像の準備ができました。スマートフォンでは、画像を長押しして保存することもできます。';
+    }catch{
+      if(id!==requestId || !pngDialog.open)return;
+      $('png-status').textContent='画像を作成できませんでした。ページを開き直すか、もう一度お試しください。';
+      $('png-retry').hidden=false;
+    }
+  }
+  $('png-button').addEventListener('click',()=>{
+    pngPage.options[0].disabled=!current;
+    pngPage.value=$('reference-view').hidden?'result':'reference';
+    pngDialog.showModal(); updatePng();
+  });
+  pngPage.addEventListener('change',updatePng);
+  $('png-retry').addEventListener('click',updatePng);
+  pngDialog.addEventListener('close',()=>{if(!pngDialog.open)clearPng();});
   // The same calculation is available to supported in-browser agents.
   const context=document.modelContext;
   if(context?.registerTool){

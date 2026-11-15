@@ -6,48 +6,56 @@
   const color=n=>`var(--c${n===11?2:n===22?8:n})`;
   const badge=n=>`<span class="badge" style="--badge-color:${color(n)}">${n}</span>`;
   const number=n=>`${n.value}${n.previous===null?'':` <small>/ ${n.previous}</small>`}`;
-  let current=null, overview=true, editing=false, fitFrame=0;
-  const root=document.documentElement, resultStage=$('result-stage'), resultSheet=$('result-sheet');
-  function fitResult(){
+  let current=null, overview=true, referenceOverview=true, editing=false, fitFrame=0, activeView=null;
+  const root=document.documentElement, resultSheet=$('result-sheet'), referenceSheet=$('reference-sheet');
+  function fitSheet(){
     fitFrame=0;
-    if(!root.classList.contains('result-fit') || root.classList.contains('is-printing'))return;
+    if(!root.classList.contains('sheet-fit') || root.classList.contains('is-printing'))return;
+    const sheet=activeView==='reference'?referenceSheet:resultSheet;
+    const stage=sheet.parentElement;
     const vp=window.visualViewport;
     // Use the visible height as browser toolbars move, while allowing pinch zoom.
     const height=vp && vp.scale===1 ? vp.height : root.clientHeight;
-    const top=resultStage.getBoundingClientRect().top+window.scrollY;
-    const width=Math.max(resultSheet.offsetWidth,resultSheet.scrollWidth);
-    const sheetHeight=Math.max(resultSheet.offsetHeight,resultSheet.scrollHeight);
-    if(!width || !sheetHeight || !resultStage.clientWidth)return;
-    const scale=Math.min(1,(resultStage.clientWidth-2)/width,Math.max(96,height-top-10)/sheetHeight);
-    resultStage.style.setProperty('--fit-scale',String(scale));
-    resultStage.style.setProperty('--fit-height',Math.ceil(sheetHeight*scale+1)+'px');
+    const top=stage.getBoundingClientRect().top+window.scrollY;
+    const width=Math.max(sheet.offsetWidth,sheet.scrollWidth);
+    const sheetHeight=Math.max(sheet.offsetHeight,sheet.scrollHeight);
+    if(!width || !sheetHeight || !stage.clientWidth)return;
+    const scale=Math.min(Math.max(1,stage.clientWidth-2)/width,Math.max(1,height-top-12)/sheetHeight);
+    stage.style.setProperty('--fit-scale',String(scale));
+    stage.style.setProperty('--fit-height',Math.ceil(sheetHeight*scale+1)+'px');
   }
-  function queueFit(){if(!fitFrame)fitFrame=requestAnimationFrame(fitResult);}
-  function syncResultView(){
-    const isRef=$('result-view').hidden, hasResult=!!current, fit=!isRef && hasResult && overview && !editing;
+  function queueFit(){if(!fitFrame)fitFrame=requestAnimationFrame(fitSheet);}
+  function syncSheetView(){
+    const isRef=activeView==='reference', hasResult=!!current, fit=isRef?referenceOverview:hasResult && overview && !editing;
     $('input-panel').hidden=isRef || (hasResult && !editing);
     $('result-toolbar').hidden=!hasResult;
-    $('calculation-details').hidden=!hasResult || fit;
+    $('calculation-details').hidden=!hasResult || (!isRef && fit);
     $('fit-result').setAttribute('aria-pressed',String(overview && !editing));
     $('expand-result').setAttribute('aria-pressed',String(!overview || editing));
-    root.classList.toggle('result-fit',fit);
+    $('fit-reference').setAttribute('aria-pressed',String(referenceOverview));
+    $('expand-reference').setAttribute('aria-pressed',String(!referenceOverview));
+    root.classList.toggle('sheet-fit',fit);
     queueFit();
   }
   function setResultMode(fit){
-    overview=fit;editing=false;syncResultView();
+    if(activeView==='reference')referenceOverview=fit;
+    else{overview=fit;editing=false;}
+    syncSheetView();
     window.scrollTo(0,0);
   }
   window.addEventListener('resize',queueFit);
   window.visualViewport?.addEventListener('resize',queueFit);
   if(window.ResizeObserver){
     const observer=new ResizeObserver(queueFit);
-    for(const el of [document.querySelector('.app-header'),$('result-toolbar'),resultSheet])observer.observe(el);
+    for(const el of [document.querySelector('.app-header'),$('result-toolbar'),$('reference-toolbar'),resultSheet,referenceSheet])observer.observe(el);
   }
   document.fonts?.ready.then(queueFit);
   $('fit-result').addEventListener('click',()=>setResultMode(true));
   $('expand-result').addEventListener('click',()=>setResultMode(false));
+  $('fit-reference').addEventListener('click',()=>setResultMode(true));
+  $('expand-reference').addEventListener('click',()=>setResultMode(false));
   $('edit-result').addEventListener('click',()=>{
-    editing=true;syncResultView();
+    editing=true;syncSheetView();
     $('surname').focus();
   });
   function syncExportButtons(){
@@ -56,11 +64,14 @@
   }
   $('birthday').max=N.localISO();
   function showView(view){
+    const changed=activeView!==view;
+    activeView=view;
     const isRef=view==='reference';
     $('result-view').hidden=isRef; $('reference-view').hidden=!isRef;
-    syncResultView();
+    syncSheetView();
     syncExportButtons();
     document.querySelectorAll('[data-view]').forEach(b=>{const active=b.dataset.view===(isRef?'reference':'result');b.classList.toggle('active',active);if(active)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
+    if(changed)window.scrollTo(0,0);
   }
   function navigate(view){if(location.hash!==`#${view}`)location.hash=view;else showView(view);}
   window.addEventListener('hashchange',()=>showView(location.hash==='#reference'?'reference':'result'));
@@ -71,7 +82,7 @@
     const surname=$('surname').value.trim(),given=$('given').value.trim();
     $('roman-preview').textContent=surname||given?`ローマ字：${N.romanize(surname)} ${N.romanize(given)}`:'ローマ字表記は、読みの入力後に表示されます。';
     // An edited form invalidates its old result so it cannot be printed under new inputs.
-    if(current){current=null;resultSheet.hidden=true;$('empty-state').hidden=false;syncResultView();syncExportButtons();}
+    if(current){current=null;resultSheet.hidden=true;$('empty-state').hidden=false;syncSheetView();syncExportButtons();}
     $('form-error').hidden=true;
   }
   $('reading-form').addEventListener('input',previewRoman);
@@ -113,13 +124,13 @@
     const difference=(a,b)=>`${Math.max(a,b)} − ${Math.min(a,b)} ＝ ${Math.abs(a-b)}`;
     $('calculation-content').innerHTML=`<p><strong>お名前</strong>　${esc(r.roman)}<br>人質数：${seq(r.person)}　／　心質：${seq(r.soul)}　／　気質：${seq(r.outer)}</p><p><strong>誕生数</strong>　${r.year} ＋ ${r.month} ＋ ${r.day} ＝ ${r.birth.total}<br>${r.birth.split?`${Math.floor(r.birth.total/100)} ＋ ${r.birth.total%100}`:[...String(r.birth.total)].join(' ＋ ')} ＝ ${r.birth.intermediate} → ${r.birth.steps.slice(1).join(' → ')||r.birth.value}<br>表示：${N.notation(r.birth)}</p><p><strong>成熟数</strong>　${r.birth.value} ＋ ${r.person.value} ＝ ${seq(r.maturity)}<br><strong>4期</strong>　月 ${m}・日 ${d}・年 ${y}<br>1期：${m}＋${d} → ${r.stages[0].value}　2期：${d}＋${y} → ${r.stages[1].value}　3期：${r.stages[0].value}＋${r.stages[1].value} → ${r.stages[2].value}　4期：${m}＋${y} → ${r.stages[3].value}</p><p><strong>杖</strong>　大きい数から小さい数を引き、同じ数なら0。<br>1期（月と日）：${difference(m,d)}　2期（日と年）：${difference(d,y)}<br>3期（1期の杖と2期の杖）：${difference(r.stages[0].challenge,r.stages[1].challenge)}　4期（月と年）：${difference(m,y)}</p><p><strong>期間</strong>　トラウマ期の終わり：36 − ${r.birth.value} ＝ ${r.stages[0].end}歳。以降は9年ごとの区切り。<br><strong>個人の周期</strong>　${r.birth.value}の列が0歳。現在は${r.age}歳、周期は${r.cycle}。</p>`;
     resultSheet.hidden=false;$('empty-state').hidden=true;
-    overview=true;editing=false;syncResultView();syncExportButtons();
+    overview=true;editing=false;syncSheetView();syncExportButtons();
   }
   function calculateForm(){
     try {
       current=N.calculate({surname:$('surname').value.trim(),given:$('given').value.trim(),birthday:$('birthday').value,displayName:$('display-name').value});
       renderResult(current);$('form-error').hidden=true;navigate('result');return current;
-    } catch(error){$('form-error').textContent=error.message;$('form-error').hidden=false;current=null;resultSheet.hidden=true;$('empty-state').hidden=false;syncResultView();syncExportButtons();return null;}
+    } catch(error){$('form-error').textContent=error.message;$('form-error').hidden=false;current=null;resultSheet.hidden=true;$('empty-state').hidden=false;syncSheetView();syncExportButtons();return null;}
   }
   $('reading-form').addEventListener('submit',event=>{
     event.preventDefault();
@@ -205,7 +216,7 @@
     if(result && !reading)return;
     $('png-status').textContent='画像を作成しています…';
     try{
-      const blob=await window.NumerologyPng.render(result ? $('result-sheet') : document.querySelector('.reference-paper'));
+      const blob=await window.NumerologyPng.render(result ? resultSheet : referenceSheet);
       if(id!==requestId || !pngDialog.open || (result && reading!==current))return;
       previewUrl=URL.createObjectURL(blob);
       preview.src=previewUrl; preview.alt=result?'鑑定結果のプレビュー':'数字の主な作用と意味のプレビュー'; preview.hidden=false;

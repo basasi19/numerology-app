@@ -4,9 +4,9 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="名前と生年月日から数秘術の鑑定結果を表示。鑑定結果と説明資料をPDFやPNG画像に保存できます。">
   <meta name="referrer" content="no-referrer"><title>数秘術鑑定</title>
-  <link rel="stylesheet" href="styles.css?v=20261115-fit">
-  <link id="print-styles" rel="stylesheet" href="print.css?v=20261115-fit" media="print">
-  <script defer src="core.js?v=20261015-pdf"></script><script defer src="meanings.js?v=20261015-pdf"></script><script defer src="png-export.js?v=20261103-png"></script><script defer src="app.js?v=20261115-fit"></script>
+  <link rel="stylesheet" href="styles.css?v=sheet-fit-2">
+  <link id="print-styles" rel="stylesheet" href="print.css?v=sheet-fit-2" media="print">
+  <script defer src="core.js?v=20261015-pdf"></script><script defer src="meanings.js?v=20261015-pdf"></script><script defer src="png-export.js?v=20261103-png"></script><script defer src="app.js?v=sheet-fit-2"></script>
 </head>
 <body>
   <header class="app-header no-print">
@@ -34,20 +34,26 @@
       <div id="result-toolbar" class="result-toolbar no-print" hidden>
         <div class="result-modes" role="group" aria-label="鑑定結果の表示方法">
           <button type="button" class="secondary" id="fit-result" aria-pressed="true">全体表示</button>
-          <button type="button" class="secondary" id="expand-result" aria-pressed="false">拡大表示</button>
+          <button type="button" class="secondary" id="expand-result" aria-pressed="false">通常表示</button>
         </div>
         <button type="button" id="edit-result" class="secondary" aria-controls="input-panel">入力を編集</button>
       </div>
-      <div id="result-stage"><article id="result-sheet" class="paper result-paper" hidden></article></div>
+      <div id="result-stage" class="fit-stage"><article id="result-sheet" class="paper result-paper" hidden></article></div>
       <details id="calculation-details" class="calculation-details no-print" hidden><summary>計算の内訳を確認</summary><div id="calculation-content"></div></details>
     </section>
     <section id="reference-view" class="view" aria-label="数字の意味の資料" hidden>
-      <article class="paper reference-paper"><div class="sheet-content">
+      <div id="reference-toolbar" class="result-toolbar no-print">
+        <div class="result-modes" role="group" aria-label="資料の表示方法">
+          <button type="button" class="secondary" id="fit-reference" aria-pressed="true">全体表示</button>
+          <button type="button" class="secondary" id="expand-reference" aria-pressed="false">通常表示</button>
+        </div>
+      </div>
+      <div id="reference-stage" class="fit-stage"><article id="reference-sheet" class="paper reference-paper"><div class="sheet-content">
         <h1>数字の主な作用と意味</h1>
         <div class="reference-intro"><p>数術の数の法則の中心にあるのは、1から9までの一桁の自然数です。数術では、これを「ベース・ナンバー」と呼び、すべての数の基本となる数だと考えます。</p><p>ベース・ナンバーには、それぞれ固有の数術的な意味があります。現代の数術が定める数の意味は、たとえば以下のようなものになります。</p></div>
         <div id="meanings-table"></div>
         </div>
-      </article>
+      </article></div>
     </section>
   </main>
   <footer class="app-footer no-print">数秘術鑑定<span>鑑定結果と資料をPDF・PNGで保存</span></footer>

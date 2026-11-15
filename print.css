@@ -5,7 +5,7 @@ html, body { margin: 0; padding: 0; background: white; }
 .no-print, #empty-state, noscript { display: none !important; }
 main { display: contents; padding: 0; }
 .view, .view[hidden] { display: contents !important; }
-#result-stage { display: contents; }
+.fit-stage { display: contents; }
 .paper {
   page: reading;
   box-sizing: border-box;

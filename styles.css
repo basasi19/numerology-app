@@ -16,3 +16,50 @@
 .png-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
 #png-share:not([hidden]) + #png-download{background:white;color:var(--ink);border:1px solid var(--line)}
 @media screen and (max-width:800px){.app-header{gap:10px;flex-wrap:wrap}.app-header nav{order:3;width:100%;margin:0}.nav-button{flex:1}.export-actions{margin-left:auto;gap:5px}.export-actions button{font-size:13px;padding:9px 10px}}
+
+.result-toolbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.result-modes{display:flex;gap:6px}
+.result-toolbar button{padding:7px 12px;font-size:13px;white-space:nowrap}
+.result-toolbar [aria-pressed="true"]{color:white;background:var(--ink);border-color:var(--ink);font-weight:700}
+@media screen{
+  .result-fit:not(.is-printing) .app-header{padding-block:12px}
+  .result-fit:not(.is-printing) .app-footer{display:none}
+  .result-fit:not(.is-printing) #result-stage{position:relative;height:var(--fit-height,0px);overflow:hidden;overflow:clip}
+  .result-fit:not(.is-printing) #result-stage>.result-paper{
+    position:absolute;top:0;left:50%;width:1120px;max-width:none;padding:20px 24px 14px;
+    transform-origin:top center;transform:translateX(-50%) scale(var(--fit-scale,1));box-shadow:none
+  }
+  .result-fit:not(.is-printing) #result-stage .result-grid{grid-template-columns:minmax(0,39%) minmax(0,61%)}
+  .result-fit:not(.is-printing) #result-stage .result-left{border-right:1px solid var(--line);padding-right:20px}
+  .result-fit:not(.is-printing) #result-stage .result-right{padding-left:20px;margin-top:0}
+  .result-fit:not(.is-printing) #result-stage .result-title{font-size:30px;padding-bottom:8px;margin-bottom:14px}
+  .result-fit:not(.is-printing) #result-stage .person-name{font-size:36px;line-height:1.24}
+  .result-fit:not(.is-printing) #result-stage .birth-date{font-size:17px;margin:5px 0 12px}
+  .result-fit:not(.is-printing) #result-stage .section-heading{font-size:17px;margin:10px 0 8px;padding-top:7px}
+  .result-fit:not(.is-printing) #result-stage .name-letters{gap:5px 10px;padding:0 0 10px}
+  .result-fit:not(.is-printing) #result-stage .letter-word{gap:5px}
+  .result-fit:not(.is-printing) #result-stage .letter{min-width:18px}
+  .result-fit:not(.is-printing) #result-stage .letter .alpha{font-size:21px}
+  .result-fit:not(.is-printing) #result-stage .metric{grid-template-columns:65px 95px minmax(0,1fr);gap:4px;padding:9px 0}
+  .result-fit:not(.is-printing) #result-stage .metric .number{font-size:28px}
+  .result-fit:not(.is-printing) #result-stage .metric .number small{font-size:19px}
+  .result-fit:not(.is-printing) #result-stage .metric .description{font-size:13px}
+  .result-fit:not(.is-printing) #result-stage .correlation{height:184px}
+  .result-fit:not(.is-printing) #result-stage .birth-mission{grid-template-columns:40% 60%;min-height:0}
+  .result-fit:not(.is-printing) #result-stage .big-number{font-size:48px}
+  .result-fit:not(.is-printing) #result-stage .big-number small{font-size:31px}
+  .result-fit:not(.is-printing) #result-stage .stat-label{font-size:16px}
+  .result-fit:not(.is-printing) #result-stage .weekday{font-size:32px}
+  .result-fit:not(.is-printing) #result-stage .stage-row{min-height:31px;margin:3px 0 3px calc(var(--indent,0)*11px);padding:1px 15px 1px 4px;gap:10px;flex-wrap:nowrap}
+  .result-fit:not(.is-printing) #result-stage .stage-row .badge{width:30px;height:30px;flex-basis:30px;font-size:22px}
+  .result-fit:not(.is-printing) #result-stage .stage-label{min-width:86px;font-size:15px}
+  .result-fit:not(.is-printing) #result-stage .stage-age{font-size:14px}
+  .result-fit:not(.is-printing) #result-stage .challenge{font-size:12px;margin:0;width:auto}
+  .result-fit:not(.is-printing) #result-stage .cycle-table{min-width:0}
+  .result-fit:not(.is-printing) #result-stage .cycle-table th,.result-fit:not(.is-printing) #result-stage .cycle-table td{height:21px;padding:2px 0}
+  .result-fit:not(.is-printing) #result-stage .cycle-table .badge{width:24px;height:24px;min-width:24px;font-size:18px}
+  .result-fit:not(.is-printing) #result-stage .lifecycle{margin-top:8px}
+  .result-fit:not(.is-printing) #result-stage .plant-strip svg{height:80px}
+  .result-fit:not(.is-printing) #result-stage .lifecycle-numbers{font-size:20px}
+  .result-fit:not(.is-printing) #result-stage .paper-footer{padding-top:6px;margin-top:9px}
+}
